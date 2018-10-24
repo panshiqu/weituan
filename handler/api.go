@@ -1,15 +1,36 @@
 package handler
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/panshiqu/weituan/define"
 )
+
+func serveLogin(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
 
 // ServeHTTP .
 func ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	var err error
 
+	switch r.URL.Path {
+	case "/login":
+		err = serveLogin(w, r)
+
+	default:
+		err = define.ErrUnsupportedAPI
+	}
+
+	if _, ok := err.(*define.MyError); ok {
+		fmt.Fprint(w, err)
+	}
+
+	log.Println(r.URL.Path, err)
 }
 
 // ServeFiles .
