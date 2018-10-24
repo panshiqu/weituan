@@ -23,7 +23,7 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		err = serveLogin(w, r)
 
 	default:
-		err = define.ErrUnsupportedAPI
+		err = define.ErrorUnsupportedAPI
 	}
 
 	if _, ok := err.(*define.MyError); ok {

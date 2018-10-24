@@ -3,25 +3,25 @@ package define
 import "fmt"
 
 const (
-	// ErrcodeSuccess 成功
-	ErrcodeSuccess int = 0
+	// ErrSuccess 成功
+	ErrSuccess int = 0
 
-	// ErrcodeFailure 失败
-	ErrcodeFailure int = 1
+	// ErrFailure 失败
+	ErrFailure int = 1
 
-	// ErrcodeUnsupportedAPI 不支持的接口
-	ErrcodeUnsupportedAPI int = 2
+	// ErrUnsupportedAPI 不支持的接口
+	ErrUnsupportedAPI int = 2
 )
 
 var (
-	// ErrSuccess 成功
-	ErrSuccess = &MyError{Errcode: ErrcodeSuccess, Errdesc: "success"}
+	// ErrorSuccess 成功
+	ErrorSuccess = &MyError{Errcode: ErrSuccess, Errdesc: "success"}
 
-	// ErrFailure 失败
-	ErrFailure = &MyError{Errcode: ErrcodeFailure, Errdesc: "failure"}
+	// ErrorFailure 失败
+	ErrorFailure = &MyError{Errcode: ErrFailure, Errdesc: "failure"}
 
-	// ErrUnsupportedAPI 不支持的接口
-	ErrUnsupportedAPI = &MyError{Errcode: ErrcodeUnsupportedAPI, Errdesc: "unsupported api"}
+	// ErrorUnsupportedAPI 不支持的接口
+	ErrorUnsupportedAPI = &MyError{Errcode: ErrUnsupportedAPI, Errdesc: "unsupported api"}
 )
 
 // MyError 错误
