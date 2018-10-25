@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/panshiqu/weituan/db"
 	"github.com/panshiqu/weituan/define"
 	"github.com/panshiqu/weituan/handler"
 )
@@ -15,6 +17,10 @@ func main() {
 	flag.Parse()
 
 	if err := define.Init(*conf); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := db.Init(); err != nil {
 		log.Fatal(err)
 	}
 

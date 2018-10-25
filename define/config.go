@@ -15,6 +15,7 @@ type GlobalConfig struct {
 	Address  string // 地址
 	KeyFile  string // 私钥
 	CertFile string // 证书
+	MysqlDSN string // 数据源
 }
 
 // Init 初始化
