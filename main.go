@@ -1,15 +1,29 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 
+	"github.com/panshiqu/weituan/define"
 	"github.com/panshiqu/weituan/handler"
 )
 
+var conf = flag.String("conf", "./conf.json", "conf")
+
 func main() {
+	flag.Parse()
+
+	if err := define.Init(*conf); err != nil {
+		log.Fatal(err)
+	}
+
 	http.HandleFunc("/", handler.ServeHTTP)
 	http.HandleFunc("/files/", handler.ServeFiles)
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	if !define.GC.HTTPS {
+		log.Fatal(http.ListenAndServe(define.GC.Address, nil))
+	} else {
+		log.Fatal(http.ListenAndServeTLS(define.GC.Address, define.GC.CertFile, define.GC.KeyFile, nil))
+	}
 }
