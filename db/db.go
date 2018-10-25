@@ -51,3 +51,10 @@ func Init() (err error) {
 
 	return nil
 }
+
+// GetN 获取指定数据库
+func GetN(n int) redis.Conn {
+	c := REDIS.Get()
+	c.Do("SELECT", n)
+	return c
+}
