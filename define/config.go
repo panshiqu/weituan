@@ -11,11 +11,13 @@ var GC GlobalConfig
 
 // GlobalConfig 全局配置
 type GlobalConfig struct {
-	HTTPS    bool
-	Address  string // 地址
-	KeyFile  string // 私钥
-	CertFile string // 证书
-	MysqlDSN string // 数据源
+	HTTPS     bool
+	Address   string // 地址
+	KeyFile   string // 私钥
+	CertFile  string // 证书
+	MysqlDSN  string // 数据源
+	RedisAddr string // 地址
+	RedisAuth string // 密码
 }
 
 // Init 初始化
