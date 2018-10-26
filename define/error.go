@@ -18,29 +18,29 @@ const (
 
 var (
 	// ErrorSuccess 成功
-	ErrorSuccess = &MyError{Errcode: ErrSuccess, Errdesc: "success"}
+	ErrorSuccess = &MyError{ErrCode: ErrSuccess, ErrDesc: "success"}
 
 	// ErrorFailure 失败
-	ErrorFailure = &MyError{Errcode: ErrFailure, Errdesc: "failure"}
+	ErrorFailure = &MyError{ErrCode: ErrFailure, ErrDesc: "failure"}
 
 	// ErrorUnsupportedAPI 不支持的接口
-	ErrorUnsupportedAPI = &MyError{Errcode: ErrUnsupportedAPI, Errdesc: "unsupported api"}
+	ErrorUnsupportedAPI = &MyError{ErrCode: ErrUnsupportedAPI, ErrDesc: "unsupported api"}
 
 	// ErrorInvalidSignature 无效的签名
-	ErrorInvalidSignature = &MyError{Errcode: ErrInvalidSignature, Errdesc: "invalid signature"}
+	ErrorInvalidSignature = &MyError{ErrCode: ErrInvalidSignature, ErrDesc: "invalid signature"}
 )
 
 // MyError 错误
 type MyError struct {
-	Errcode int    `json:",omitempty"` // 错误码
-	Errdesc string `json:",omitempty"` // 错误描述
+	ErrCode int    `json:",omitempty"` // 错误码
+	ErrDesc string `json:",omitempty"` // 错误描述
 }
 
 func (m *MyError) Error() string {
-	return fmt.Sprintf(`{"Errcode":%d,"Errdesc":"%s"}`, m.Errcode, m.Errdesc)
+	return fmt.Sprintf(`{"ErrCode":%d,"ErrDesc":"%s"}`, m.ErrCode, m.ErrDesc)
 }
 
 // NewFailure 失败
 func NewFailure(desc string) *MyError {
-	return &MyError{Errcode: ErrFailure, Errdesc: desc}
+	return &MyError{ErrCode: ErrFailure, ErrDesc: desc}
 }
