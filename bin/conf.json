@@ -1,6 +1,11 @@
 {
-	"Address": ":8080",
-	"MysqlDSN": "root:MyNewPass1!@tcp(172.16.10.177:3306)/game",
-	"RedisAddr": "172.16.10.177:6379",
-	"RedisAuth": ""
+	"HTTPS": true,
+	"Address": ":443",
+	"KeyFile": "215084599570883.key",
+	"CertFile": "215084599570883.pem",
+	"MysqlDSN": "debian-sys-maint:zRCVjyVjEwZvEIyg@tcp(localhost:3306)/weituan?charset=utf8mb4",
+	"RedisAddr": "localhost:6379",
+	"RedisAuth": "",
+	"AppID": "wx694dfc07e2ccb6cf",
+	"AppSecret": "6c8f09c6c814ec5506c6d2d315fceebc"
 }
