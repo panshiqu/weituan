@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"crypto/md5"
 	"crypto/sha1"
 	"encoding/json"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/panshiqu/weituan/define"
 	"github.com/panshiqu/weituan/utils"
@@ -42,6 +44,41 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func serveUpload(w http.ResponseWriter, r *http.Request) error {
+	f, fh, err := r.FormFile("file")
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	h := md5.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return err
+	}
+
+	// md5命名
+	fn := fmt.Sprintf("./files/%x%s", h.Sum(nil), filepath.Ext(fh.Filename))
+
+	fmt.Fprintf(w, `{"URL":"%s"}`, fn[1:])
+
+	// 文件已存在
+	if _, err := os.Stat(fn); err == nil {
+		return nil
+	}
+
+	n, err := os.Create(fn)
+	if err != nil {
+		return err
+	}
+	defer n.Close()
+
+	if _, err := io.Copy(n, f); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // ServeHTTP .
 func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var err error
@@ -49,6 +86,9 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
 	case "/login":
 		err = serveLogin(w, r)
+
+	case "/upload":
+		err = serveUpload(w, r)
 
 	default:
 		err = define.ErrorUnsupportedAPI
