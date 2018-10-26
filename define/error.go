@@ -11,6 +11,9 @@ const (
 
 	// ErrUnsupportedAPI 不支持的接口
 	ErrUnsupportedAPI int = 2
+
+	// ErrInvalidSignature 无效的签名
+	ErrInvalidSignature int = 3
 )
 
 var (
@@ -22,6 +25,9 @@ var (
 
 	// ErrorUnsupportedAPI 不支持的接口
 	ErrorUnsupportedAPI = &MyError{Errcode: ErrUnsupportedAPI, Errdesc: "unsupported api"}
+
+	// ErrorInvalidSignature 无效的签名
+	ErrorInvalidSignature = &MyError{Errcode: ErrInvalidSignature, Errdesc: "invalid signature"}
 )
 
 // MyError 错误
@@ -32,4 +38,9 @@ type MyError struct {
 
 func (m *MyError) Error() string {
 	return fmt.Sprintf(`{"Errcode":%d,"Errdesc":"%s"}`, m.Errcode, m.Errdesc)
+}
+
+// NewFailure 失败
+func NewFailure(desc string) *MyError {
+	return &MyError{Errcode: ErrFailure, Errdesc: desc}
 }
