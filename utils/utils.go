@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-// ReadUnmarshalJSON 简单封装
+// ReadUnmarshalJSON 读取数据反序列化成JSON对象
 func ReadUnmarshalJSON(r io.Reader, js interface{}) error {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -17,7 +17,7 @@ func ReadUnmarshalJSON(r io.Reader, js interface{}) error {
 	return json.Unmarshal(data, js)
 }
 
-// HTTPGetJSON 简单封装
+// HTTPGetJSON GET请求返回数据反序列化成JSON对象
 func HTTPGetJSON(url string, js interface{}) error {
 	resp, err := http.Get(url)
 	if err != nil {

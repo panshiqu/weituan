@@ -15,9 +15,11 @@ type GlobalConfig struct {
 	Address   string // 地址
 	KeyFile   string // 私钥
 	CertFile  string // 证书
-	MysqlDSN  string // 数据源
-	RedisAddr string // 地址
-	RedisAuth string // 密码
+	MysqlDSN  string // MYSQL数据源
+	RedisAddr string // REDIS地址
+	RedisAuth string // REDIS密码
+	AppID     string // 小程序编号
+	AppSecret string // 小程序密钥
 }
 
 // Init 初始化
@@ -26,7 +28,6 @@ func Init(name string) error {
 	if err != nil {
 		return err
 	}
-
 	defer f.Close()
 
 	return utils.ReadUnmarshalJSON(f, &GC)

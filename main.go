@@ -16,10 +16,12 @@ var conf = flag.String("conf", "./conf.json", "conf")
 func main() {
 	flag.Parse()
 
+	// 配置初始化
 	if err := define.Init(*conf); err != nil {
 		log.Fatal(err)
 	}
 
+	// 数据库初始化
 	if err := db.Init(); err != nil {
 		log.Fatal(err)
 	}

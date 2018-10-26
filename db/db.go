@@ -20,7 +20,7 @@ func Init() (err error) {
 		return err
 	}
 
-	if err := MYSQL.Ping(); err != nil {
+	if err = MYSQL.Ping(); err != nil {
 		return err
 	}
 
