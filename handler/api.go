@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"crypto/sha1"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -8,9 +10,35 @@ import (
 	"os"
 
 	"github.com/panshiqu/weituan/define"
+	"github.com/panshiqu/weituan/utils"
 )
 
 func serveLogin(w http.ResponseWriter, r *http.Request) error {
+	wxLogin := &define.WxLogin{}
+	if err := utils.ReadUnmarshalJSON(r.Body, wxLogin); err != nil {
+		return err
+	}
+
+	wxUserInfo := &define.WxUserInfo{}
+	if err := json.Unmarshal([]byte(wxLogin.RawData), wxUserInfo); err != nil {
+		return err
+	}
+
+	// 登录凭证校验
+	wxCode2Session := &define.WxCode2Session{}
+	if err := utils.HTTPGetJSON(fmt.Sprintf("https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code", define.GC.AppID, define.GC.AppSecret, wxLogin.Code), wxCode2Session); err != nil {
+		return err
+	}
+
+	if wxCode2Session.ErrCode != 0 {
+		return define.NewFailure(fmt.Sprintf("%d:%s", wxCode2Session.ErrCode, wxCode2Session.ErrMsg))
+	}
+
+	// 计算比对签名
+	if wxLogin.Signature != fmt.Sprintf("%x", sha1.Sum([]byte(wxLogin.RawData+wxCode2Session.SessionKey))) {
+		return define.ErrorInvalidSignature
+	}
+
 	return nil
 }
 
