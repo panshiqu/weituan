@@ -72,6 +72,10 @@ func serveUpload(w http.ResponseWriter, r *http.Request) error {
 	}
 	defer n.Close()
 
+	if _, err := f.Seek(0, io.SeekStart); err != nil {
+		return err
+	}
+
 	if _, err := io.Copy(n, f); err != nil {
 		return err
 	}
