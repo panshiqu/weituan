@@ -13,19 +13,19 @@ const (
 	RedisDefault = 0
 )
 
-// MYSQL .
-var MYSQL *sql.DB
+// MySQL .
+var MySQL *sql.DB
 
 // REDIS .
 var REDIS *redis.Pool
 
 // Init 初始化
 func Init() (err error) {
-	if MYSQL, err = sql.Open("mysql", define.GC.MysqlDSN); err != nil {
+	if MySQL, err = sql.Open("mysql", define.GC.MySQLDSN); err != nil {
 		return err
 	}
 
-	if err = MYSQL.Ping(); err != nil {
+	if err = MySQL.Ping(); err != nil {
 		return err
 	}
 

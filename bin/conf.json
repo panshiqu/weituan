@@ -3,7 +3,7 @@
 	"Address": ":443",
 	"KeyFile": "215084599570883.key",
 	"CertFile": "215084599570883.pem",
-	"MysqlDSN": "debian-sys-maint:zRCVjyVjEwZvEIyg@tcp(localhost:3306)/weituan?charset=utf8mb4",
+	"MySQLDSN": "debian-sys-maint:zRCVjyVjEwZvEIyg@tcp(localhost:3306)/weituan?charset=utf8mb4",
 	"RedisAddr": "localhost:6379",
 	"RedisAuth": "",
 	"AppID": "wx694dfc07e2ccb6cf",
