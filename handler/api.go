@@ -11,9 +11,13 @@ import (
 	"os"
 	"path/filepath"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/panshiqu/weituan/define"
 	"github.com/panshiqu/weituan/utils"
 )
+
+// uidToken 令牌
+var uidToken = jwt.New(jwt.SigningMethodHS256)
 
 func serveLogin(w http.ResponseWriter, r *http.Request) error {
 	wxLogin := &define.WxLogin{}
@@ -40,6 +44,15 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 	if wxLogin.Signature != fmt.Sprintf("%x", sha1.Sum([]byte(wxLogin.RawData+wxCode2Session.SessionKey))) {
 		return define.ErrorInvalidSignature
 	}
+
+	// 签发令牌
+	uidToken.Header["uid"] = 123
+	token, err := uidToken.SignedString([]byte("hello"))
+	if err != nil {
+		return err
+	}
+
+	w.Header().Set("Token", token)
 
 	return nil
 }
