@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/garyburd/redigo/redis"
+	"github.com/panshiqu/weituan/db"
 	"github.com/panshiqu/weituan/define"
 	"github.com/panshiqu/weituan/utils"
 )
@@ -58,6 +60,12 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 }
 
 func serveUpload(w http.ResponseWriter, r *http.Request) error {
+	if _, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
+		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+	}); err != nil {
+		return err
+	}
+
 	f, fh, err := r.FormFile("file")
 	if err != nil {
 		return err
