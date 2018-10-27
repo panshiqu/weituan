@@ -8,6 +8,11 @@ import (
 	"github.com/panshiqu/weituan/define"
 )
 
+const (
+	// RedisDefault 默认数据库
+	RedisDefault = 0
+)
+
 // MYSQL .
 var MYSQL *sql.DB
 
@@ -57,4 +62,11 @@ func GetN(n int) redis.Conn {
 	c := REDIS.Get()
 	c.Do("SELECT", n)
 	return c
+}
+
+// DoOne 执行一条Redis命令
+func DoOne(index int, commandName string, args ...interface{}) (reply interface{}, err error) {
+	c := GetN(index)
+	defer c.Close()
+	return c.Do(commandName, args...)
 }
