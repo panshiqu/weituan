@@ -42,7 +42,7 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 		return define.NewFailure(fmt.Sprintf("%d:%s", wxCode2Session.ErrCode, wxCode2Session.ErrMsg))
 	}
 
-	// 计算比对签名
+	// 校验签名
 	if wxLogin.Signature != fmt.Sprintf("%x", sha1.Sum([]byte(wxLogin.RawData+wxCode2Session.SessionKey))) {
 		return define.ErrorInvalidSignature
 	}
@@ -60,6 +60,7 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 }
 
 func serveUpload(w http.ResponseWriter, r *http.Request) error {
+	// 校验令牌
 	if _, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
 		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
 	}); err != nil {
