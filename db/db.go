@@ -16,8 +16,8 @@ const (
 // MySQL .
 var MySQL *sql.DB
 
-// REDIS .
-var REDIS *redis.Pool
+// Redis .
+var Redis *redis.Pool
 
 // Init 初始化
 func Init() (err error) {
@@ -29,7 +29,7 @@ func Init() (err error) {
 		return err
 	}
 
-	REDIS = &redis.Pool{
+	Redis = &redis.Pool{
 		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,
 		Dial: func() (redis.Conn, error) {
@@ -59,7 +59,7 @@ func Init() (err error) {
 
 // GetN 获取指定数据库
 func GetN(n int) redis.Conn {
-	c := REDIS.Get()
+	c := Redis.Get()
 	c.Do("SELECT", n)
 	return c
 }

@@ -16,8 +16,8 @@ type GlobalConfig struct {
 	KeyFile   string // 私钥
 	CertFile  string // 证书
 	MySQLDSN  string // MySQL数据源
-	RedisAddr string // REDIS地址
-	RedisAuth string // REDIS密码
+	RedisAddr string // Redis地址
+	RedisAuth string // Redis密码
 	AppID     string // 小程序编号
 	AppSecret string // 小程序密钥
 }
