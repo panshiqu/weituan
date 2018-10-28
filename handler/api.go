@@ -3,6 +3,7 @@ package handler
 import (
 	"crypto/md5"
 	"crypto/sha1"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -46,6 +47,26 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 	if wxLogin.Signature != fmt.Sprintf("%x", sha1.Sum([]byte(wxLogin.RawData+wxCode2Session.SessionKey))) {
 		return define.ErrorInvalidSignature
 	}
+
+	var userID int
+
+	if err := db.MySQL.QueryRow("SELECT UserID FROM user WHERE OpenID = ?", wxCode2Session.OpenID).Scan(&userID); err == sql.ErrNoRows {
+		res, err := db.MySQL.Exec("INSERT INTO user (OpenID) VALUES (?)", wxCode2Session.OpenID)
+		if err != nil {
+			return err
+		}
+
+		uid, err := res.LastInsertId()
+		if err != nil {
+			return err
+		}
+
+		userID = int(uid)
+	} else if err != nil {
+		return err
+	}
+
+	// 用户信息缓存到Redis包括SessionKey
 
 	// 签发令牌
 	uidToken.Header["uid"] = 123
