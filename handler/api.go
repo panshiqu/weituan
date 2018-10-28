@@ -133,6 +133,20 @@ func serveUpload(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func servePublish(w http.ResponseWriter, r *http.Request) error {
+	// 校验令牌
+	token, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
+		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+	})
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintf(w, `{"SkuID":%v}`, token.Header["uid"])
+
+	return nil
+}
+
 // ServeHTTP .
 func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var err error
@@ -143,6 +157,9 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case "/upload":
 		err = serveUpload(w, r)
+
+	case "/publish":
+		err = servePublish(w, r)
 
 	default:
 		err = define.ErrorUnsupportedAPI
