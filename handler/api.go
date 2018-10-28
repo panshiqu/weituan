@@ -66,7 +66,14 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	// 用户信息缓存到Redis包括SessionKey
+	redisUserInfo := &define.RedisUserInfo{
+		SessionKey: wxCode2Session.SessionKey,
+		WxUserInfo: *wxUserInfo,
+	}
+
+	if _, err := db.DoOne(db.RedisDefault, "HMSET", redis.Args{}.Add(userID).AddFlat(redisUserInfo)...); err != nil {
+		return err
+	}
 
 	// 签发令牌
 	uidToken.Header["uid"] = 123

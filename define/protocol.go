@@ -22,3 +22,9 @@ type WxCode2Session struct {
 	ErrCode    int    `json:"errcode,omitempty"`     // 错误码
 	ErrMsg     string `json:"errMsg,omitempty"`      // 错误信息
 }
+
+// RedisUserInfo 缓存用户信息
+type RedisUserInfo struct {
+	SessionKey string
+	WxUserInfo
+}
