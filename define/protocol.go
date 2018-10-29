@@ -63,3 +63,29 @@ type RequestShow struct {
 	SkuID   int `json:",omitempty"` // 商品编号
 	ShareID int `json:",omitempty"` // 分享编号
 }
+
+// BaseUserInfo 基础用户信息
+type BaseUserInfo struct {
+	UserID int `json:",omitempty"` // 用户编号
+	WxUserInfo
+}
+
+// HelperUserInfo 助力者用户信息
+type HelperUserInfo struct {
+	BargainPrice float64 `json:",omitempty"` // 砍价
+	BaseUserInfo
+}
+
+// ResponseShow 显示
+type ResponseShow struct {
+	Seller   *BaseUserInfo     `json:",omitempty"` // 卖家
+	Buyer    *BaseUserInfo     `json:",omitempty"` // 买家
+	Name     string            `json:",omitempty"` // 名称
+	Price    float64           `json:",omitempty"` // 价格
+	Intro    string            `json:",omitempty"` // 介绍
+	Images   string            `json:",omitempty"` // 图片
+	WeChatID string            `json:",omitempty"` // 微信号（卖家）
+	Time     int64             `json:",omitempty"` // 时间（倒计时 秒数 =0截止）
+	Helpers  []*HelperUserInfo `json:",omitempty"` // 助力者
+	Bargain  int               `json:",omitempty"` // 砍价（-1不支持砍价 0不能再砍价 +n剩余N次砍价机会）
+}
