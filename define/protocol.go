@@ -42,3 +42,24 @@ type RequestPublish struct {
 	WeChatID string   `json:",omitempty"` // 微信号（卖家）
 	Deadline int64    `json:",omitempty"` // 截止时间
 }
+
+// ResponsePublish 发布
+type ResponsePublish struct {
+	SkuID int `json:",omitempty"` // 商品编号
+}
+
+// RequestShare 分享
+type RequestShare struct {
+	SkuID int `json:",omitempty"` // 商品编号
+}
+
+// ResponseShare 分享
+type ResponseShare struct {
+	ShareID int `json:",omitempty"` // 分享编号
+}
+
+// RequestShow 显示
+type RequestShow struct {
+	SkuID   int `json:",omitempty"` // 商品编号
+	ShareID int `json:",omitempty"` // 分享编号
+}
