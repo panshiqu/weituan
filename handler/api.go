@@ -163,6 +163,43 @@ func servePublish(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func serveShare(w http.ResponseWriter, r *http.Request) error {
+	// 校验令牌
+	token, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
+		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+	})
+	if err != nil {
+		return err
+	}
+
+	share := &define.RequestShare{}
+	if err := utils.ReadUnmarshalJSON(r.Body, share); err != nil {
+		return err
+	}
+
+	var shareID int
+
+	if err := db.MySQL.QueryRow("SELECT ShareID FROM share WHERE UserID = ? AND SkuID = ?", token.Header["uid"], share.SkuID).Scan(&shareID); err == sql.ErrNoRows {
+		res, err := db.MySQL.Exec("INSERT INTO share (UserID,SkuID) VALUES (?,?)", token.Header["uid"], share.SkuID)
+		if err != nil {
+			return err
+		}
+
+		sid, err := res.LastInsertId()
+		if err != nil {
+			return err
+		}
+
+		shareID = int(sid)
+	} else if err != nil {
+		return err
+	}
+
+	fmt.Fprintf(w, `{"ShareID":%d}`, shareID)
+
+	return nil
+}
+
 // ServeHTTP .
 func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var err error
@@ -176,6 +213,9 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case "/publish":
 		err = servePublish(w, r)
+
+	case "/share":
+		err = serveShare(w, r)
 
 	default:
 		err = define.ErrorUnsupportedAPI
