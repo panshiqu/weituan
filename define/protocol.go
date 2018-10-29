@@ -31,16 +31,16 @@ type RedisUserInfo struct {
 
 // RequestPublish 发布
 type RequestPublish struct {
-	FormID   string   `json:",omitempty"` // 表单编号（发送模板消息）
-	SkuID    int      `json:",omitempty"` // 商品编号（修改时提供）
-	Name     string   `json:",omitempty"` // 名称
-	Price    float64  `json:",omitempty"` // 价格
-	MinPrice float64  `json:",omitempty"` // 底价
-	Bargain  int      `json:",omitempty"` // 砍价（0不支持砍价 +n随机砍N次 -n等值砍N次）
-	Intro    string   `json:",omitempty"` // 介绍
-	Images   []string `json:",omitempty"` // 图片
-	WeChatID string   `json:",omitempty"` // 微信号（卖家）
-	Deadline int64    `json:",omitempty"` // 截止时间
+	FormID   string  `json:",omitempty"` // 表单编号（发送模板消息）
+	SkuID    int     `json:",omitempty"` // 商品编号（修改时提供）
+	Name     string  `json:",omitempty"` // 名称
+	Price    float64 `json:",omitempty"` // 价格
+	MinPrice float64 `json:",omitempty"` // 底价
+	Bargain  int     `json:",omitempty"` // 砍价（0不支持砍价 +n随机砍N次 -n等值砍N次）
+	Intro    string  `json:",omitempty"` // 介绍
+	Images   string  `json:",omitempty"` // 图片
+	WeChatID string  `json:",omitempty"` // 微信号（卖家）
+	Deadline int64   `json:",omitempty"` // 截止时间
 }
 
 // ResponsePublish 发布

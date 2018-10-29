@@ -142,7 +142,23 @@ func servePublish(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	fmt.Fprintf(w, `{"SkuID":%v}`, token.Header["uid"])
+	publish := &define.RequestPublish{}
+	if err := utils.ReadUnmarshalJSON(r.Body, publish); err != nil {
+		return err
+	}
+
+	res, err := db.MySQL.Exec("INSERT INTO sku (UserID,Name,Price,MinPrice,Bargain,Intro,Images,WeChatID,Deadline) VALUES (?,?,?,?,?,?,?,?,FROM_UNIXTIME(?))",
+		token.Header["uid"], publish.Name, publish.Price, publish.MinPrice, publish.Bargain, publish.Intro, publish.Images, publish.WeChatID, publish.Deadline)
+	if err != nil {
+		return err
+	}
+
+	skuID, err := res.LastInsertId()
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintf(w, `{"SkuID":%d}`, skuID)
 
 	return nil
 }
