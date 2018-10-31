@@ -76,8 +76,8 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// 签发令牌
-	uidToken.Header["uid"] = 123
-	token, err := uidToken.SignedString([]byte("hello"))
+	uidToken.Header["uid"] = userID
+	token, err := uidToken.SignedString([]byte(wxCode2Session.SessionKey))
 	if err != nil {
 		return err
 	}
