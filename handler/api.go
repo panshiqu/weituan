@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/garyburd/redigo/redis"
@@ -200,6 +201,79 @@ func serveShare(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func serveShow(w http.ResponseWriter, r *http.Request) error {
+	show := &define.RequestShow{}
+	if err := utils.ReadUnmarshalJSON(r.Body, show); err != nil {
+		return err
+	}
+
+	rs := &define.ResponseShow{
+		Seller: &define.BaseUserInfo{},
+	}
+
+	if show.ShareID != 0 {
+		rs.Buyer = &define.BaseUserInfo{}
+
+		if err := db.MySQL.QueryRow("SELECT UserID,SkuID FROM share WHERE ShareID = ?", show.ShareID).Scan(&rs.Buyer.UserID, &show.SkuID); err != nil {
+			return err
+		}
+
+		// 获取买家信息
+	}
+
+	if err := db.MySQL.QueryRow("SELECT UserID,Name,Price,ABS(Bargain),Intro,Images,WeChatID,UNIX_TIMESTAMP(Deadline) FROM sku WHERE SkuID = ?", show.SkuID).Scan(&rs.Seller.UserID, &rs.Name, &rs.Price, &rs.Bargain, &rs.Intro, &rs.Images, &rs.WeChatID, &rs.Time); err != nil {
+		return err
+	}
+
+	// 获取卖家信息
+
+	if rs.Time == 0 {
+		rs.Time = -1 // 没有截止时间
+	} else if nowUnix := time.Now().Unix(); nowUnix < rs.Time {
+		rs.Time -= nowUnix // 倒计时
+	} else {
+		rs.Time = 0 // 已截止
+	}
+
+	if rs.Bargain == 0 {
+		rs.Bargain = -1 // 不支持砍价
+	} else if show.ShareID != 0 {
+		rows, err := db.MySQL.Query("SELECT UserID,BargainPrice FROM bargain WHERE ShareID = ?", show.ShareID)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			helper := &define.HelperUserInfo{}
+
+			if err := rows.Scan(&helper.UserID, &helper.BargainPrice); err != nil {
+				return err
+			}
+
+			// 获取助力者信息
+
+			rs.Helpers = append(rs.Helpers, helper)
+		}
+
+		if err := rows.Err(); err != nil {
+			return err
+		}
+
+		// 剩余砍价机会
+		rs.Bargain -= len(rs.Helpers)
+	}
+
+	data, err := json.Marshal(rs)
+	if err != nil {
+		return err
+	}
+
+	w.Write(data)
+
+	return nil
+}
+
 // ServeHTTP .
 func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var err error
@@ -216,6 +290,9 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case "/share":
 		err = serveShare(w, r)
+
+	case "/show":
+		err = serveShow(w, r)
 
 	default:
 		err = define.ErrorUnsupportedAPI
