@@ -29,6 +29,11 @@ type RedisUserInfo struct {
 	WxUserInfo
 }
 
+// ResponseUpload 上传
+type ResponseUpload struct {
+	URL string // 相对地址
+}
+
 // RequestPublish 发布
 type RequestPublish struct {
 	FormID   string  `json:",omitempty"` // 表单编号（发送模板消息）
