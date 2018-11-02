@@ -94,3 +94,26 @@ type ResponseShow struct {
 	Helpers  []*HelperUserInfo `json:",omitempty"` // 助力者
 	Bargain  int               `json:",omitempty"` // 砍价（-1不支持砍价 0不能再砍价 +n剩余N次砍价机会）
 }
+
+// SkuInfo 商品信息
+type SkuInfo struct {
+	SkuID    int     `json:",omitempty"` // 商品编号
+	Name     string  `json:",omitempty"` // 名称
+	Price    float64 `json:",omitempty"` // 价格
+	MinPrice float64 `json:",omitempty"` // 底价
+	Bargain  int     `json:",omitempty"` // 砍价（0不支持砍价 +n随机砍N次 -n等值砍N次）
+	Images   string  `json:",omitempty"` // 图片
+	Deadline int64   `json:",omitempty"` // 截止时间
+	Status   int     `json:",omitempty"` // 状态（审核）
+}
+
+// RequestList 列表
+type RequestList struct {
+	UserID int `json:",omitempty"` // 用户编号（查看他人列表）
+}
+
+// ResponseList 列表
+type ResponseList struct {
+	Seller *BaseUserInfo `json:",omitempty"` // 卖家
+	Skus   []*SkuInfo    `json:",omitempty"` // 商品
+}

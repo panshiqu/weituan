@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -274,6 +275,69 @@ func serveShow(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func serveList(w http.ResponseWriter, r *http.Request) error {
+	seller := &define.BaseUserInfo{}
+
+	if r.ContentLength == 0 {
+		// 校验令牌
+		token, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
+			return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+		})
+		if err != nil {
+			return err
+		}
+
+		uid, err := strconv.Atoi(fmt.Sprint(token.Header["uid"]))
+		if err != nil {
+			return err
+		}
+
+		seller.UserID = uid
+	} else {
+		list := &define.RequestList{}
+		if err := utils.ReadUnmarshalJSON(r.Body, list); err != nil {
+			return err
+		}
+
+		seller.UserID = list.UserID
+	}
+
+	// 获取卖家信息
+
+	rl := &define.ResponseList{
+		Seller: seller,
+	}
+
+	rows, err := db.MySQL.Query("SELECT SkuID,Name,Price,MinPrice,Bargain,Images,UNIX_TIMESTAMP(Deadline) FROM sku WHERE UserID = ?", rl.Seller.UserID)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		sku := &define.SkuInfo{}
+
+		if err := rows.Scan(&sku.SkuID, &sku.Name, &sku.Price, &sku.MinPrice, &sku.Bargain, &sku.Images, &sku.Deadline); err != nil {
+			return err
+		}
+
+		rl.Skus = append(rl.Skus, sku)
+	}
+
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	data, err := json.Marshal(rl)
+	if err != nil {
+		return err
+	}
+
+	w.Write(data)
+
+	return nil
+}
+
 // ServeHTTP .
 func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var err error
@@ -293,6 +357,9 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case "/show":
 		err = serveShow(w, r)
+
+	case "/list":
+		err = serveList(w, r)
 
 	default:
 		err = define.ErrorUnsupportedAPI
