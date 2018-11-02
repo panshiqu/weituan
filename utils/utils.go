@@ -27,3 +27,11 @@ func HTTPGetJSON(url string, js interface{}) error {
 
 	return ReadUnmarshalJSON(resp.Body, js)
 }
+
+// AbsInt 绝对值
+func AbsInt(n int) int {
+	if n < 0 {
+		return -n
+	}
+	return n
+}
