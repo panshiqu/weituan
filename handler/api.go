@@ -220,6 +220,9 @@ func serveShow(w http.ResponseWriter, r *http.Request) error {
 		}
 
 		// 获取买家信息
+		if err := getWxUserInfo(rs.Buyer); err != nil {
+			return err
+		}
 	}
 
 	if err := db.MySQL.QueryRow("SELECT UserID,Name,Price,ABS(Bargain),Intro,Images,WeChatID,UNIX_TIMESTAMP(Deadline) FROM sku WHERE SkuID = ?", show.SkuID).Scan(&rs.Seller.UserID, &rs.Name, &rs.Price, &rs.Bargain, &rs.Intro, &rs.Images, &rs.WeChatID, &rs.Time); err != nil {
@@ -227,6 +230,9 @@ func serveShow(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// 获取卖家信息
+	if err := getWxUserInfo(rs.Seller); err != nil {
+		return err
+	}
 
 	if rs.Time == 0 {
 		rs.Time = -1 // 没有截止时间
@@ -253,6 +259,9 @@ func serveShow(w http.ResponseWriter, r *http.Request) error {
 			}
 
 			// 获取助力者信息
+			if err := getWxUserInfo(&helper.BaseUserInfo); err != nil {
+				return err
+			}
 
 			rs.Helpers = append(rs.Helpers, helper)
 		}
@@ -303,6 +312,9 @@ func serveList(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// 获取卖家信息
+	if err := getWxUserInfo(seller); err != nil {
+		return err
+	}
 
 	rl := &define.ResponseList{
 		Seller: seller,
@@ -336,6 +348,19 @@ func serveList(w http.ResponseWriter, r *http.Request) error {
 	w.Write(data)
 
 	return nil
+}
+
+func getWxUserInfo(info *define.BaseUserInfo) error {
+	v, err := redis.Values(db.DoOne(db.RedisDefault, "HGETALL", info.UserID))
+	if err != nil {
+		return err
+	}
+
+	if len(v) != 0 {
+		return redis.ScanStruct(v, info)
+	}
+
+	return db.MySQL.QueryRow("SELECT Nickname,AvatarURL,Gender FROM user WHERE UserID = ?", info.UserID).Scan(&info.Nickname, &info.AvatarURL, &info.Gender)
 }
 
 // ServeHTTP .

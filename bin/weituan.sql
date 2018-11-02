@@ -3,15 +3,15 @@
 
  Source Server         : localhost
  Source Server Type    : MySQL
- Source Server Version : 50718
- Source Host           : localhost
+ Source Server Version : 50720
+ Source Host           : 172.16.10.177
  Source Database       : weituan
 
  Target Server Type    : MySQL
- Target Server Version : 50718
+ Target Server Version : 50720
  File Encoding         : utf-8
 
- Date: 10/29/2018 21:21:51 PM
+ Date: 11/02/2018 15:43:29 PM
 */
 
 SET NAMES utf8mb4;
@@ -76,6 +76,10 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `UserID` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户编号',
   `OpenID` varchar(255) NOT NULL COMMENT '用户唯一标识',
+  `Nickname` varchar(255) NOT NULL COMMENT '昵称',
+  `AvatarURL` varchar(255) NOT NULL COMMENT '头像',
+  `Gender` tinyint(3) unsigned NOT NULL COMMENT '性别',
+  `RegisterTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '注册时间',
   PRIMARY KEY (`UserID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=100000 DEFAULT CHARSET=utf8mb4;
 

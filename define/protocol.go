@@ -2,9 +2,9 @@ package define
 
 // WxUserInfo 用户信息
 type WxUserInfo struct {
-	Nickname  string `json:"nickName,omitempty"`  // 昵称
-	AvatarURL string `json:"avatarUrl,omitempty"` // 头像
-	Gender    int    `json:"gender,omitempty"`    // 性别
+	Nickname  string `json:"nickName,omitempty" redis:"nickName"`   // 昵称
+	AvatarURL string `json:"avatarUrl,omitempty" redis:"avatarUrl"` // 头像
+	Gender    int    `json:"gender,omitempty" redis:"gender"`       // 性别
 }
 
 // WxLogin 登陆
