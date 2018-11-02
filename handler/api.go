@@ -149,18 +149,25 @@ func servePublish(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	res, err := db.MySQL.Exec("INSERT INTO sku (UserID,Name,Price,MinPrice,Bargain,Intro,Images,WeChatID,Deadline) VALUES (?,?,?,?,?,?,?,?,FROM_UNIXTIME(?))",
-		token.Header["uid"], publish.Name, publish.Price, publish.MinPrice, publish.Bargain, publish.Intro, publish.Images, publish.WeChatID, publish.Deadline)
-	if err != nil {
-		return err
-	}
+	if publish.SkuID == 0 {
+		res, err := db.MySQL.Exec("INSERT INTO sku (UserID,Name,Price,MinPrice,Bargain,Intro,Images,WeChatID,Deadline) VALUES (?,?,?,?,?,?,?,?,FROM_UNIXTIME(?))",
+			token.Header["uid"], publish.Name, publish.Price, publish.MinPrice, publish.Bargain, publish.Intro, publish.Images, publish.WeChatID, publish.Deadline)
+		if err != nil {
+			return err
+		}
 
-	skuID, err := res.LastInsertId()
-	if err != nil {
-		return err
-	}
+		skuID, err := res.LastInsertId()
+		if err != nil {
+			return err
+		}
 
-	fmt.Fprintf(w, `{"SkuID":%d}`, skuID)
+		fmt.Fprintf(w, `{"SkuID":%d}`, skuID)
+	} else {
+		if _, err := db.MySQL.Exec("UPDATE sku SET Name=?, Price=?, MinPrice=?, Bargain=?, Intro=?, Images=?, WeChatID=?, Deadline=FROM_UNIXTIME(?) WHERE SkuID = ? AND UserID = ?",
+			publish.Name, publish.Price, publish.MinPrice, publish.Bargain, publish.Intro, publish.Images, publish.WeChatID, publish.Deadline, publish.SkuID, token.Header["uid"]); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
