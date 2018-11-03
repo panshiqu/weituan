@@ -117,3 +117,13 @@ type ResponseList struct {
 	Seller *BaseUserInfo `json:",omitempty"` // 卖家
 	Skus   []*SkuInfo    `json:",omitempty"` // 商品
 }
+
+// RequestBargain 砍价
+type RequestBargain struct {
+	ShareID int `json:",omitempty"` // 分享编号
+}
+
+// ResponseBargain 砍价
+type ResponseBargain struct {
+	BargainPrice float64 `json:",omitempty"` // 砍价
+}

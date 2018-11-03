@@ -357,6 +357,73 @@ func serveList(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func serveBargain(w http.ResponseWriter, r *http.Request) error {
+	// 校验令牌
+	token, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
+		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+	})
+	if err != nil {
+		return err
+	}
+
+	bargain := &define.RequestBargain{}
+	if err := utils.ReadUnmarshalJSON(r.Body, bargain); err != nil {
+		return err
+	}
+
+	var skuID int
+
+	if err := db.MySQL.QueryRow("SELECT SkuID FROM share WHERE ShareID = ?", bargain.ShareID).Scan(&skuID); err != nil {
+		return err
+	}
+
+	var m float64 // 可砍总额
+	var n int     // 可砍次数
+
+	if err := db.MySQL.QueryRow("SELECT Price-MinPrice,Bargain FROM sku WHERE SkuID = ?", skuID).Scan(&m, &n); err != nil {
+		return err
+	}
+
+	// 不支持砍价
+	if n == 0 {
+		return nil
+	}
+
+	var a float64 // 已砍额度
+	var b int     // 已砍次数
+
+	if err := db.MySQL.QueryRow("SELECT IFNULL(SUM(BargainPrice),0),COUNT(UserID) FROM bargain WHERE ShareID = ?", bargain.ShareID).Scan(&a, &b); err != nil {
+		return err
+	}
+
+	// 已砍到底价
+	if a >= m {
+		return nil
+	}
+
+	// 已砍够次数
+	if b >= utils.AbsInt(n) {
+		return nil
+	}
+
+	var v float64
+
+	// 等值砍
+	if n < 0 {
+		v = (m - a) / float64(-n-b)
+	} else {
+		return nil
+	}
+
+	if _, err := db.MySQL.Exec("INSERT INTO bargain (ShareID,UserID,BargainPrice) VALUES (?,?,?)", bargain.ShareID, token.Header["uid"], v); err != nil {
+		return err
+	}
+
+	fmt.Fprintf(w, `{"BargainTime":%d,"BargainPrice":%.2f}`, time.Now().Unix(), v)
+
+	return nil
+}
+
 func getWxUserInfo(info *define.BaseUserInfo) error {
 	v, err := redis.Values(db.DoOne(db.RedisDefault, "HGETALL", info.UserID))
 	if err != nil {
@@ -392,6 +459,9 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case "/list":
 		err = serveList(w, r)
+
+	case "/bargain":
+		err = serveBargain(w, r)
 
 	default:
 		err = define.ErrorUnsupportedAPI
