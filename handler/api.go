@@ -243,7 +243,7 @@ func serveShow(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	if rs.Bargain != 0 && show.ShareID != 0 {
-		rows, err := db.MySQL.Query("SELECT UserID,BargainPrice,BargainTime FROM bargain WHERE ShareID = ?", show.ShareID)
+		rows, err := db.MySQL.Query("SELECT UserID,BargainPrice,UNIX_TIMESTAMP(BargainTime) FROM bargain WHERE ShareID = ?", show.ShareID)
 		if err != nil {
 			return err
 		}
