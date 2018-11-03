@@ -94,7 +94,7 @@ func serveUpload(w http.ResponseWriter, r *http.Request) error {
 	if _, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
 		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
 	}); err != nil {
-		return err
+		return define.ErrorInvalidToken
 	}
 
 	f, fh, err := r.FormFile("file")
@@ -141,7 +141,7 @@ func servePublish(w http.ResponseWriter, r *http.Request) error {
 		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
 	})
 	if err != nil {
-		return err
+		return define.ErrorInvalidToken
 	}
 
 	publish := &define.RequestPublish{}
@@ -178,7 +178,7 @@ func serveShare(w http.ResponseWriter, r *http.Request) error {
 		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
 	})
 	if err != nil {
-		return err
+		return define.ErrorInvalidToken
 	}
 
 	share := &define.RequestShare{}
@@ -300,7 +300,7 @@ func serveList(w http.ResponseWriter, r *http.Request) error {
 			return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
 		})
 		if err != nil {
-			return err
+			return define.ErrorInvalidToken
 		}
 
 		uid, err := strconv.Atoi(fmt.Sprint(token.Header["uid"]))
@@ -363,7 +363,7 @@ func serveBargain(w http.ResponseWriter, r *http.Request) error {
 		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
 	})
 	if err != nil {
-		return err
+		return define.ErrorInvalidToken
 	}
 
 	bargain := &define.RequestBargain{}

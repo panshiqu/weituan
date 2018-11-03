@@ -14,6 +14,9 @@ const (
 
 	// ErrInvalidSignature 无效的签名
 	ErrInvalidSignature int = 3
+
+	// ErrInvalidToken 无效的令牌
+	ErrInvalidToken int = 4
 )
 
 var (
@@ -28,6 +31,9 @@ var (
 
 	// ErrorInvalidSignature 无效的签名
 	ErrorInvalidSignature = &MyError{ErrCode: ErrInvalidSignature, ErrDesc: "invalid signature"}
+
+	// ErrorInvalidToken 无效的令牌
+	ErrorInvalidToken = &MyError{ErrCode: ErrInvalidToken, ErrDesc: "invalid token"}
 )
 
 // MyError 错误
