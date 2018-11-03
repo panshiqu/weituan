@@ -243,7 +243,7 @@ func serveShow(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	if rs.Bargain != 0 && show.ShareID != 0 {
-		rows, err := db.MySQL.Query("SELECT UserID,BargainPrice FROM bargain WHERE ShareID = ?", show.ShareID)
+		rows, err := db.MySQL.Query("SELECT UserID,BargainPrice,BargainTime FROM bargain WHERE ShareID = ?", show.ShareID)
 		if err != nil {
 			return err
 		}
@@ -252,7 +252,7 @@ func serveShow(w http.ResponseWriter, r *http.Request) error {
 		for rows.Next() {
 			helper := &define.HelperUserInfo{}
 
-			if err := rows.Scan(&helper.UserID, &helper.BargainPrice); err != nil {
+			if err := rows.Scan(&helper.UserID, &helper.BargainPrice, &helper.BargainTime); err != nil {
 				return err
 			}
 
