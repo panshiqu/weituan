@@ -216,7 +216,8 @@ func serveShow(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	rs := &define.ResponseShow{
-		Seller: &define.BaseUserInfo{},
+		Seller:      &define.BaseUserInfo{},
+		CurrentTime: time.Now().Unix(),
 	}
 
 	if show.ShareID != 0 {

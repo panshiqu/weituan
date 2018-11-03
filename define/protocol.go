@@ -83,9 +83,10 @@ type HelperUserInfo struct {
 
 // ResponseShow 显示
 type ResponseShow struct {
-	Seller  *BaseUserInfo     `json:",omitempty"` // 卖家
-	Buyer   *BaseUserInfo     `json:",omitempty"` // 买家
-	Helpers []*HelperUserInfo `json:",omitempty"` // 助力者
+	Seller      *BaseUserInfo     `json:",omitempty"` // 卖家
+	Buyer       *BaseUserInfo     `json:",omitempty"` // 买家
+	Helpers     []*HelperUserInfo `json:",omitempty"` // 助力者
+	CurrentTime int64             `json:",omitempty"` // 当前时间
 	SkuInfo
 }
 
