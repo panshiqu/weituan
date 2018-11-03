@@ -25,8 +25,41 @@ type WxCode2Session struct {
 
 // RedisUserInfo 缓存用户信息
 type RedisUserInfo struct {
-	SessionKey string
+	SessionKey string // 会话密钥
 	WxUserInfo
+}
+
+// BaseUserInfo 基础用户信息
+type BaseUserInfo struct {
+	UserID int `json:",omitempty"` // 用户编号
+	WxUserInfo
+}
+
+// HelperUserInfo 助力者用户信息
+type HelperUserInfo struct {
+	BargainInfo
+	BaseUserInfo
+}
+
+// SkuInfo 商品信息
+type SkuInfo struct {
+	SkuID       int     `json:",omitempty"` // 商品编号
+	Name        string  `json:",omitempty"` // 名称
+	Price       float64 `json:",omitempty"` // 价格
+	MinPrice    float64 `json:",omitempty"` // 底价
+	Bargain     int     `json:",omitempty"` // 砍价（0不支持砍价 +n随机砍N次 -n等值砍N次）
+	Intro       string  `json:",omitempty"` // 介绍
+	Images      string  `json:",omitempty"` // 图片
+	WeChatID    string  `json:",omitempty"` // 微信号（卖家）
+	Deadline    int64   `json:",omitempty"` // 截止时间
+	PublishTime int64   `json:",omitempty"` // 发布时间
+	Status      int     `json:",omitempty"` // 状态（审核）（暂未实现）
+}
+
+// BargainInfo 砍价信息
+type BargainInfo struct {
+	BargainTime  int64   `json:",omitempty"` // 时间
+	BargainPrice float64 `json:",omitempty"` // 砍价
 }
 
 // ResponseUpload 上传
@@ -61,18 +94,6 @@ type RequestShow struct {
 	ShareID int `json:",omitempty"` // 分享编号
 }
 
-// BaseUserInfo 基础用户信息
-type BaseUserInfo struct {
-	UserID int `json:",omitempty"` // 用户编号
-	WxUserInfo
-}
-
-// HelperUserInfo 助力者用户信息
-type HelperUserInfo struct {
-	BargainPrice float64 `json:",omitempty"` // 砍价
-	BaseUserInfo
-}
-
 // ResponseShow 显示
 type ResponseShow struct {
 	Seller      *BaseUserInfo     `json:",omitempty"` // 卖家
@@ -80,21 +101,6 @@ type ResponseShow struct {
 	Helpers     []*HelperUserInfo `json:",omitempty"` // 助力者
 	CurrentTime int64             `json:",omitempty"` // 当前时间
 	SkuInfo
-}
-
-// SkuInfo 商品信息
-type SkuInfo struct {
-	SkuID       int     `json:",omitempty"` // 商品编号
-	Name        string  `json:",omitempty"` // 名称
-	Price       float64 `json:",omitempty"` // 价格
-	MinPrice    float64 `json:",omitempty"` // 底价
-	Bargain     int     `json:",omitempty"` // 砍价（0不支持砍价 +n随机砍N次 -n等值砍N次）
-	Intro       string  `json:",omitempty"` // 介绍
-	Images      string  `json:",omitempty"` // 图片
-	WeChatID    string  `json:",omitempty"` // 微信号（卖家）
-	Deadline    int64   `json:",omitempty"` // 截止时间
-	PublishTime int64   `json:",omitempty"` // 发布时间
-	Status      int     `json:",omitempty"` // 状态（审核）（暂未实现）
 }
 
 // RequestList 列表
@@ -115,5 +121,5 @@ type RequestBargain struct {
 
 // ResponseBargain 砍价
 type ResponseBargain struct {
-	BargainPrice float64 `json:",omitempty"` // 砍价
+	BargainInfo
 }
