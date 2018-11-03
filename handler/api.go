@@ -374,7 +374,7 @@ func serveBargain(w http.ResponseWriter, r *http.Request) error {
 
 	// 不支持砍价
 	if n == 0 {
-		return nil
+		return &define.MyError{100001, "不支持砍价"}
 	}
 
 	var a float64 // 已砍额度
@@ -386,12 +386,12 @@ func serveBargain(w http.ResponseWriter, r *http.Request) error {
 
 	// 已砍到底价
 	if a >= m {
-		return nil
+		return &define.MyError{100002, "已砍到底价"}
 	}
 
 	// 已砍够次数
 	if b >= utils.AbsInt(n) {
-		return nil
+		return &define.MyError{100003, "已砍够次数"}
 	}
 
 	var v float64
@@ -400,7 +400,7 @@ func serveBargain(w http.ResponseWriter, r *http.Request) error {
 	if n < 0 {
 		v = (m - a) / float64(-n-b)
 	} else {
-		return nil
+		return define.NewFailure("暂不支持随机砍")
 	}
 
 	if _, err := db.MySQL.Exec("INSERT INTO bargain (ShareID,UserID,BargainPrice) VALUES (?,?,?)", bargain.ShareID, token.Header["uid"], v); err != nil {
