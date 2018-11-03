@@ -232,21 +232,13 @@ func serveShow(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
-	if err := db.MySQL.QueryRow("SELECT UserID,Name,Price,ABS(Bargain),Intro,Images,WeChatID,UNIX_TIMESTAMP(Deadline) FROM sku WHERE SkuID = ?", show.SkuID).Scan(&rs.Seller.UserID, &rs.Name, &rs.Price, &rs.Bargain, &rs.Intro, &rs.Images, &rs.WeChatID, &rs.Time); err != nil {
+	if err := db.MySQL.QueryRow("SELECT SkuID,UserID,Name,Price,MinPrice,Bargain,Intro,Images,WeChatID,UNIX_TIMESTAMP(Deadline),UNIX_TIMESTAMP(PublishTime) FROM sku WHERE SkuID = ?", show.SkuID).Scan(&rs.SkuID, &rs.Seller.UserID, &rs.Name, &rs.Price, &rs.MinPrice, &rs.Bargain, &rs.Intro, &rs.Images, &rs.WeChatID, &rs.Deadline, &rs.PublishTime); err != nil {
 		return err
 	}
 
 	// 获取卖家信息
 	if err := getWxUserInfo(rs.Seller); err != nil {
 		return err
-	}
-
-	if rs.Time == 0 {
-		rs.Time = -1 // 没有截止时间
-	} else if nowUnix := time.Now().Unix(); nowUnix < rs.Time {
-		rs.Time -= nowUnix // 倒计时
-	} else {
-		rs.Time = 0 // 已截止
 	}
 
 	if rs.Bargain != 0 && show.ShareID != 0 {

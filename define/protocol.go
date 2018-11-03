@@ -83,16 +83,10 @@ type HelperUserInfo struct {
 
 // ResponseShow 显示
 type ResponseShow struct {
-	Seller   *BaseUserInfo     `json:",omitempty"` // 卖家
-	Buyer    *BaseUserInfo     `json:",omitempty"` // 买家
-	Name     string            `json:",omitempty"` // 名称
-	Price    float64           `json:",omitempty"` // 价格
-	Intro    string            `json:",omitempty"` // 介绍
-	Images   string            `json:",omitempty"` // 图片
-	WeChatID string            `json:",omitempty"` // 微信号（卖家）
-	Time     int64             `json:",omitempty"` // 时间（倒计时 秒数 -1没有截止时间 0已截止）
-	Helpers  []*HelperUserInfo `json:",omitempty"` // 助力者
-	Bargain  int               `json:",omitempty"` // 砍价（0不支持砍价 +n随机砍N次 -n等值砍N次）
+	Seller  *BaseUserInfo     `json:",omitempty"` // 卖家
+	Buyer   *BaseUserInfo     `json:",omitempty"` // 买家
+	Helpers []*HelperUserInfo `json:",omitempty"` // 助力者
+	SkuInfo
 }
 
 // SkuInfo 商品信息
