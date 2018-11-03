@@ -457,6 +457,8 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if _, ok := err.(*define.MyError); ok {
 		fmt.Fprint(w, err)
+	} else if err != nil {
+		fmt.Fprint(w, define.NewFailure(err.Error()))
 	}
 
 	log.Println(r.URL.Path, err)
