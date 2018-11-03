@@ -92,7 +92,7 @@ type ResponseShow struct {
 	WeChatID string            `json:",omitempty"` // 微信号（卖家）
 	Time     int64             `json:",omitempty"` // 时间（倒计时 秒数 -1没有截止时间 0已截止）
 	Helpers  []*HelperUserInfo `json:",omitempty"` // 助力者
-	Bargain  int               `json:",omitempty"` // 砍价（-1不支持砍价 0不能再砍价 +n剩余N次砍价机会）
+	Bargain  int               `json:",omitempty"` // 砍价（0不支持砍价 +n随机砍N次 -n等值砍N次）
 }
 
 // SkuInfo 商品信息

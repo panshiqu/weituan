@@ -249,9 +249,7 @@ func serveShow(w http.ResponseWriter, r *http.Request) error {
 		rs.Time = 0 // 已截止
 	}
 
-	if rs.Bargain == 0 {
-		rs.Bargain = -1 // 不支持砍价
-	} else if show.ShareID != 0 {
+	if rs.Bargain != 0 && show.ShareID != 0 {
 		rows, err := db.MySQL.Query("SELECT UserID,BargainPrice FROM bargain WHERE ShareID = ?", show.ShareID)
 		if err != nil {
 			return err
@@ -276,9 +274,6 @@ func serveShow(w http.ResponseWriter, r *http.Request) error {
 		if err := rows.Err(); err != nil {
 			return err
 		}
-
-		// 剩余砍价机会
-		rs.Bargain -= len(rs.Helpers)
 	}
 
 	data, err := json.Marshal(rs)
