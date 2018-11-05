@@ -53,7 +53,7 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 	var userID int
 
 	if err := db.MySQL.QueryRow("SELECT UserID FROM user WHERE OpenID = ?", wxCode2Session.OpenID).Scan(&userID); err == sql.ErrNoRows {
-		res, err := db.MySQL.Exec("INSERT INTO user (OpenID) VALUES (?)", wxCode2Session.OpenID)
+		res, err := db.MySQL.Exec("INSERT INTO user (OpenID,Nickname,AvatarURL,Gender) VALUES (?,?,?,?)", wxCode2Session.OpenID, wxUserInfo.Nickname, wxUserInfo.AvatarURL, wxUserInfo.Gender)
 		if err != nil {
 			return err
 		}
