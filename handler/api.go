@@ -425,6 +425,76 @@ func getWxUserInfo(info *define.BaseUserInfo) error {
 	return db.MySQL.QueryRow("SELECT Nickname,AvatarURL,Gender FROM user WHERE UserID = ?", info.UserID).Scan(&info.Nickname, &info.AvatarURL, &info.Gender)
 }
 
+func serveShareList(w http.ResponseWriter, r *http.Request) error {
+	buyer := &define.BaseUserInfo{}
+
+	if r.ContentLength == 0 {
+		// 校验令牌
+		token, err := jwt.Parse(r.Header.Get("token"), func(token *jwt.Token) (interface{}, error) {
+			return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+		})
+		if err != nil {
+			return define.ErrorInvalidToken
+		}
+
+		uid, err := strconv.Atoi(fmt.Sprint(token.Header["uid"]))
+		if err != nil {
+			return err
+		}
+
+		buyer.UserID = uid
+	} else {
+		shareList := &define.RequestShareList{}
+		if err := utils.ReadUnmarshalJSON(r.Body, shareList); err != nil {
+			return err
+		}
+
+		buyer.UserID = shareList.UserID
+	}
+
+	// 获取买家信息
+	if err := getWxUserInfo(buyer); err != nil {
+		return err
+	}
+
+	rsl := &define.ResponseShareList{
+		Buyer: buyer,
+	}
+
+	rows, err := db.MySQL.Query("SELECT ShareID,SkuID,UNIX_TIMESTAMP(ShareTime) FROM share WHERE UserID = ?", rsl.Buyer.UserID)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		sku := &define.ShareSkuInfo{}
+
+		if err := rows.Scan(&sku.ShareID, &sku.SkuID, &sku.ShareTime); err != nil {
+			return err
+		}
+
+		if err := db.MySQL.QueryRow("SELECT Name,Price,MinPrice,Bargain,Intro,Images,WeChatID,UNIX_TIMESTAMP(Deadline),UNIX_TIMESTAMP(PublishTime) FROM sku WHERE SkuID = ?", sku.SkuID).Scan(&sku.Name, &sku.Price, &sku.MinPrice, &sku.Bargain, &sku.Intro, &sku.Images, &sku.WeChatID, &sku.Deadline, &sku.PublishTime); err != nil {
+			return err
+		}
+
+		rsl.Skus = append(rsl.Skus, sku)
+	}
+
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	data, err := json.Marshal(rsl)
+	if err != nil {
+		return err
+	}
+
+	w.Write(data)
+
+	return nil
+}
+
 // ServeHTTP .
 func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var err error
@@ -450,6 +520,9 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case "/bargain":
 		err = serveBargain(w, r)
+
+	case "/shareList":
+		err = serveShareList(w, r)
 
 	default:
 		err = define.ErrorUnsupportedAPI

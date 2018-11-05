@@ -56,6 +56,13 @@ type SkuInfo struct {
 	Status      int     `json:",omitempty"` // 状态（审核）（暂未实现）
 }
 
+// ShareSkuInfo 分享商品信息
+type ShareSkuInfo struct {
+	ShareID   int   `json:",omitempty"` // 分享编号
+	ShareTime int64 `json:",omitempty"` // 分享时间
+	SkuInfo
+}
+
 // BargainInfo 砍价信息
 type BargainInfo struct {
 	BargainTime  int64   `json:",omitempty"` // 时间
@@ -122,4 +129,15 @@ type RequestBargain struct {
 // ResponseBargain 砍价
 type ResponseBargain struct {
 	BargainInfo
+}
+
+// RequestShareList 分享列表
+type RequestShareList struct {
+	UserID int `json:",omitempty"` // 用户编号（查看他人分享列表）
+}
+
+// ResponseShareList 分享列表
+type ResponseShareList struct {
+	Buyer *BaseUserInfo   `json:",omitempty"` // 买家
+	Skus  []*ShareSkuInfo `json:",omitempty"` // 商品
 }
