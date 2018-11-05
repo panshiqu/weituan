@@ -186,25 +186,12 @@ func serveShare(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	var shareID int
-
-	if err := db.MySQL.QueryRow("SELECT ShareID FROM share WHERE UserID = ? AND SkuID = ?", token.Header["uid"], share.SkuID).Scan(&shareID); err == sql.ErrNoRows {
-		res, err := db.MySQL.Exec("INSERT INTO share (UserID,SkuID) VALUES (?,?)", token.Header["uid"], share.SkuID)
-		if err != nil {
-			return err
-		}
-
-		sid, err := res.LastInsertId()
-		if err != nil {
-			return err
-		}
-
-		shareID = int(sid)
-	} else if err != nil {
+	id, err := doShare(token.Header["uid"], share.SkuID)
+	if err != nil {
 		return err
 	}
 
-	fmt.Fprintf(w, `{"ShareID":%d}`, shareID)
+	fmt.Fprintf(w, `{"ShareID":%d}`, id)
 
 	return nil
 }
@@ -410,6 +397,28 @@ func serveBargain(w http.ResponseWriter, r *http.Request) error {
 	fmt.Fprintf(w, `{"BargainTime":%d,"BargainPrice":%.2f}`, time.Now().Unix(), v)
 
 	return nil
+}
+
+func doShare(userID interface{}, skuID int) (int, error) {
+	var shareID int
+
+	if err := db.MySQL.QueryRow("SELECT ShareID FROM share WHERE UserID = ? AND SkuID = ?", userID, skuID).Scan(&shareID); err == sql.ErrNoRows {
+		res, err := db.MySQL.Exec("INSERT INTO share (UserID,SkuID) VALUES (?,?)", userID, skuID)
+		if err != nil {
+			return 0, err
+		}
+
+		sid, err := res.LastInsertId()
+		if err != nil {
+			return 0, err
+		}
+
+		return int(sid), nil
+	} else if err != nil {
+		return 0, err
+	}
+
+	return shareID, nil
 }
 
 func getWxUserInfo(info *define.BaseUserInfo) error {
