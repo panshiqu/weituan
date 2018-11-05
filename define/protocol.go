@@ -99,6 +99,7 @@ type ResponseShare struct {
 type RequestShow struct {
 	SkuID   int `json:",omitempty"` // 商品编号
 	ShareID int `json:",omitempty"` // 分享编号
+	UserID  int `json:",omitempty"` // 用户编号（客户端分享前不便调用/share接口生成ShareID）
 }
 
 // ResponseShow 显示

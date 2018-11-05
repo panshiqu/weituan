@@ -207,13 +207,26 @@ func serveShow(w http.ResponseWriter, r *http.Request) error {
 		CurrentTime: time.Now().Unix(),
 	}
 
-	if show.ShareID != 0 {
+	if show.UserID != 0 {
+		id, err := doShare(show.UserID, show.SkuID)
+		if err != nil {
+			return err
+		}
+
+		rs.Buyer = &define.BaseUserInfo{
+			UserID: show.UserID,
+		}
+
+		show.ShareID = id
+	} else if show.ShareID != 0 {
 		rs.Buyer = &define.BaseUserInfo{}
 
 		if err := db.MySQL.QueryRow("SELECT UserID,SkuID FROM share WHERE ShareID = ?", show.ShareID).Scan(&rs.Buyer.UserID, &show.SkuID); err != nil {
 			return err
 		}
+	}
 
+	if rs.Buyer != nil {
 		// 获取买家信息
 		if err := getWxUserInfo(rs.Buyer); err != nil {
 			return err
