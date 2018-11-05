@@ -84,14 +84,14 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	w.Header().Set("Token", token)
+	w.Header().Set("token", token)
 
 	return nil
 }
 
 func serveUpload(w http.ResponseWriter, r *http.Request) error {
 	// 校验令牌
-	if _, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
+	if _, err := jwt.Parse(r.Header.Get("token"), func(token *jwt.Token) (interface{}, error) {
 		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
 	}); err != nil {
 		return define.ErrorInvalidToken
@@ -137,7 +137,7 @@ func serveUpload(w http.ResponseWriter, r *http.Request) error {
 
 func servePublish(w http.ResponseWriter, r *http.Request) error {
 	// 校验令牌
-	token, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(r.Header.Get("token"), func(token *jwt.Token) (interface{}, error) {
 		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
 	})
 	if err != nil {
@@ -174,7 +174,7 @@ func servePublish(w http.ResponseWriter, r *http.Request) error {
 
 func serveShare(w http.ResponseWriter, r *http.Request) error {
 	// 校验令牌
-	token, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(r.Header.Get("token"), func(token *jwt.Token) (interface{}, error) {
 		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
 	})
 	if err != nil {
@@ -284,7 +284,7 @@ func serveList(w http.ResponseWriter, r *http.Request) error {
 
 	if r.ContentLength == 0 {
 		// 校验令牌
-		token, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.Parse(r.Header.Get("token"), func(token *jwt.Token) (interface{}, error) {
 			return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
 		})
 		if err != nil {
@@ -347,7 +347,7 @@ func serveList(w http.ResponseWriter, r *http.Request) error {
 
 func serveBargain(w http.ResponseWriter, r *http.Request) error {
 	// 校验令牌
-	token, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(r.Header.Get("token"), func(token *jwt.Token) (interface{}, error) {
 		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
 	})
 	if err != nil {
