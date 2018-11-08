@@ -118,6 +118,8 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 
 	w.Header().Set("Token", token)
 
+	fmt.Fprintf(w, `{"UserID":%d}`, userID)
+
 	return nil
 }
 
