@@ -23,12 +23,6 @@ type WxCode2Session struct {
 	ErrMsg     string `json:"errMsg,omitempty"`      // 错误信息
 }
 
-// RedisUserInfo 缓存用户信息
-type RedisUserInfo struct {
-	SessionKey string // 会话密钥
-	WxUserInfo
-}
-
 // BaseUserInfo 基础用户信息
 type BaseUserInfo struct {
 	UserID int `json:",omitempty"` // 用户编号

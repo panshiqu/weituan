@@ -24,15 +24,50 @@ import (
 // uidToken 令牌
 var uidToken = jwt.New(jwt.SigningMethodHS256)
 
+func updateUserInfo(uid interface{}, key, data, signature string) error {
+	wxUserInfo := &define.WxUserInfo{}
+	if err := json.Unmarshal([]byte(data), wxUserInfo); err != nil {
+		return err
+	}
+
+	// 校验签名
+	if signature != fmt.Sprintf("%x", sha1.Sum([]byte(data+key))) {
+		return define.ErrorInvalidSignature
+	}
+
+	if _, err := db.MySQL.Exec("UPDATE user SET Nickname=?, AvatarURL=?, Gender=? WHERE UserID = ?", wxUserInfo.Nickname, wxUserInfo.AvatarURL, wxUserInfo.Gender, uid); err != nil {
+		return err
+	}
+
+	if _, err := db.DoOne(db.RedisDefault, "HMSET", redis.Args{}.Add(uid).AddFlat(wxUserInfo)...); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func serveLogin(w http.ResponseWriter, r *http.Request) error {
 	wxLogin := &define.WxLogin{}
 	if err := utils.ReadUnmarshalJSON(r.Body, wxLogin); err != nil {
 		return err
 	}
 
-	wxUserInfo := &define.WxUserInfo{}
-	if err := json.Unmarshal([]byte(wxLogin.RawData), wxUserInfo); err != nil {
-		return err
+	// 客户端要求拆分接口
+	if wxLogin.Code == "" {
+		// 校验令牌
+		token, err := jwt.Parse(r.Header.Get("token"), func(token *jwt.Token) (interface{}, error) {
+			return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+		})
+		if err != nil {
+			return define.ErrorInvalidToken
+		}
+
+		key, err := redis.String(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+		if err != nil {
+			return err
+		}
+
+		return updateUserInfo(token.Header["uid"], key, wxLogin.RawData, wxLogin.Signature)
 	}
 
 	// 登录凭证校验
@@ -45,15 +80,10 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 		return define.NewFailure(fmt.Sprintf("%d:%s", wxCode2Session.ErrCode, wxCode2Session.ErrMsg))
 	}
 
-	// 校验签名
-	if wxLogin.Signature != fmt.Sprintf("%x", sha1.Sum([]byte(wxLogin.RawData+wxCode2Session.SessionKey))) {
-		return define.ErrorInvalidSignature
-	}
-
 	var userID int
 
 	if err := db.MySQL.QueryRow("SELECT UserID FROM user WHERE OpenID = ?", wxCode2Session.OpenID).Scan(&userID); err == sql.ErrNoRows {
-		res, err := db.MySQL.Exec("INSERT INTO user (OpenID,Nickname,AvatarURL,Gender) VALUES (?,?,?,?)", wxCode2Session.OpenID, wxUserInfo.Nickname, wxUserInfo.AvatarURL, wxUserInfo.Gender)
+		res, err := db.MySQL.Exec("INSERT INTO user (OpenID) VALUES (?)", wxCode2Session.OpenID)
 		if err != nil {
 			return err
 		}
@@ -68,12 +98,14 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	redisUserInfo := &define.RedisUserInfo{
-		SessionKey: wxCode2Session.SessionKey,
-		WxUserInfo: *wxUserInfo,
+	// 客户端要求拆分接口
+	if wxLogin.Signature != "" {
+		if err := updateUserInfo(userID, wxCode2Session.SessionKey, wxLogin.RawData, wxLogin.Signature); err != nil {
+			return err
+		}
 	}
 
-	if _, err := db.DoOne(db.RedisDefault, "HMSET", redis.Args{}.Add(userID).AddFlat(redisUserInfo)...); err != nil {
+	if _, err := db.DoOne(db.RedisDefault, "HSET", userID, "SessionKey", wxCode2Session.SessionKey); err != nil {
 		return err
 	}
 
