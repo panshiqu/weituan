@@ -1,0 +1,13 @@
+if wx.checkSession {
+    wx.getStorageSync(token)
+    // 携带 token 发起业务请求
+} else {
+    wx.login
+    wx.getUserInfo(withCredentials=false)
+    // 收集 code、rawData、signature 发起登陆请求
+    // 登陆成功将回复 token
+}
+
+建议所有业务请求都在 checkSession 成功后发起，特别是携带微信提供签名让我比对时，否则 session_key 失效将必然失败
+我将用微信提供的 session_key 签发 token，借此与微信登陆态有效期尽量保持一致，意味着你每次 login 成功我将回复不同的 token
+暂定 token 总是通过 http header 带往服务端，也通过 header 返回给客户端，若可以请在任意回复中关注 header 中 token，给服务端按需更新 token 的能力
