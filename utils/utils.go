@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"math"
+	"math/rand"
 	"net/http"
 )
 
@@ -28,10 +30,20 @@ func HTTPGetJSON(url string, js interface{}) error {
 	return ReadUnmarshalJSON(resp.Body, js)
 }
 
-// AbsInt 绝对值
-func AbsInt(n int) int {
-	if n < 0 {
-		return -n
+// RoundPrice 价格取整
+func RoundPrice(v float64) float64 {
+	return math.Round(v*100) / 100
+}
+
+// Bargain 随机砍价
+func Bargain(m, n float64) float64 {
+	if n == 1 {
+		return m
 	}
-	return n
+	max := m / n * 2
+	res := rand.Float64() * max
+	if res < 0.02 {
+		return 0.01
+	}
+	return math.Floor(res*100) / 100
 }

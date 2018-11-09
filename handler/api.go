@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -400,7 +401,7 @@ func serveBargain(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	var m float64 // 可砍总额
-	var n int     // 可砍次数
+	var n float64 // 可砍次数
 
 	if err := db.MySQL.QueryRow("SELECT Price-MinPrice,Bargain FROM sku WHERE SkuID = ?", skuID).Scan(&m, &n); err != nil {
 		return err
@@ -412,7 +413,7 @@ func serveBargain(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	var a float64 // 已砍额度
-	var b int     // 已砍次数
+	var b float64 // 已砍次数
 
 	if err := db.MySQL.QueryRow("SELECT IFNULL(SUM(BargainPrice),0),COUNT(UserID) FROM bargain WHERE ShareID = ?", bargain.ShareID).Scan(&a, &b); err != nil {
 		return err
@@ -424,7 +425,7 @@ func serveBargain(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// 已砍够次数
-	if b >= utils.AbsInt(n) {
+	if b >= math.Abs(n) {
 		return &define.MyError{100003, "已砍够次数"}
 	}
 
@@ -432,9 +433,9 @@ func serveBargain(w http.ResponseWriter, r *http.Request) error {
 
 	// 等值砍
 	if n < 0 {
-		v = (m - a) / float64(-n-b)
+		v = utils.RoundPrice((m - a) / (-n - b))
 	} else {
-		return define.NewFailure("暂不支持随机砍")
+		v = utils.Bargain(m-a, n-b)
 	}
 
 	if _, err := db.MySQL.Exec("INSERT INTO bargain (ShareID,UserID,BargainPrice) VALUES (?,?,?)", bargain.ShareID, token.Header["uid"], v); err != nil {
