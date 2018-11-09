@@ -23,6 +23,14 @@ type WxCode2Session struct {
 	ErrMsg     string `json:"errMsg,omitempty"`      // 错误信息
 }
 
+// WxAccessToken 访问凭证
+type WxAccessToken struct {
+	AccessToken string `json:"access_token,omitempty"` // 获取到的凭证
+	ExpiresIn   int    `json:"expires_in,omitempty"`   // 凭证有效时间，单位：秒
+	ErrCode     int    `json:"errcode,omitempty"`      // 错误码
+	ErrMsg      string `json:"errMsg,omitempty"`       // 错误信息
+}
+
 // BaseUserInfo 基础用户信息
 type BaseUserInfo struct {
 	UserID int `json:",omitempty"` // 用户编号
