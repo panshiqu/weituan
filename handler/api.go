@@ -243,16 +243,13 @@ func serveShow(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	if show.UserID != 0 {
-		id, err := doShare(show.UserID, show.SkuID)
-		if err != nil {
+		if err := db.MySQL.QueryRow("SELECT ShareID FROM share WHERE UserID = ? AND SkuID = ?", show.UserID, show.SkuID).Scan(&show.ShareID); err != nil {
 			return err
 		}
 
 		rs.Buyer = &define.BaseUserInfo{
 			UserID: show.UserID,
 		}
-
-		show.ShareID = id
 	} else if show.ShareID != 0 {
 		rs.Buyer = &define.BaseUserInfo{}
 
