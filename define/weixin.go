@@ -1,5 +1,10 @@
 package define
 
+const (
+	// PublishTemplateID 发布模板编号
+	PublishTemplateID = "m5-VrAq0-h1nTEMXGiC1yGV9cyzAHB1gJtWitCvHklE"
+)
+
 // WxUserInfo 用户信息
 type WxUserInfo struct {
 	Nickname  string `json:"nickName,omitempty" redis:"nickName"`   // 昵称

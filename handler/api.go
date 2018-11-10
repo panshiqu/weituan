@@ -20,6 +20,7 @@ import (
 	"github.com/panshiqu/weituan/db"
 	"github.com/panshiqu/weituan/define"
 	"github.com/panshiqu/weituan/utils"
+	"github.com/panshiqu/weituan/wechat"
 )
 
 // uidToken 令牌
@@ -197,6 +198,11 @@ func servePublish(w http.ResponseWriter, r *http.Request) error {
 		}
 
 		fmt.Fprintf(w, `{"SkuID":%d}`, skuID)
+
+		if err := wechat.SendTemplateMessage(token.Header["uid"], define.PublishTemplateID, "", publish.FormID, "",
+			publish.Name, publish.Intro, time.Now().Format("2006-01-02 15:04:05"), fmt.Sprintf("%.2f", publish.Price), fmt.Sprintf("%.2f", publish.MinPrice)); err != nil {
+			log.Println("/publish SendTemplateMessage", err)
+		}
 	} else {
 		if _, err := db.MySQL.Exec("UPDATE sku SET Name=?, Price=?, MinPrice=?, Bargain=?, Intro=?, Images=?, WeChatID=?, Deadline=FROM_UNIXTIME(?) WHERE SkuID = ? AND UserID = ?",
 			publish.Name, publish.Price, publish.MinPrice, publish.Bargain, publish.Intro, publish.Images, publish.WeChatID, publish.Deadline, publish.SkuID, token.Header["uid"]); err != nil {
