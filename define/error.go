@@ -50,3 +50,9 @@ func (m *MyError) Error() string {
 func NewFailure(desc string) *MyError {
 	return &MyError{ErrCode: ErrFailure, ErrDesc: desc}
 }
+
+// WxError 微信错误
+type WxError struct {
+	ErrCode int    `json:"errcode,omitempty"` // 错误码
+	ErrMsg  string `json:"errMsg,omitempty"`  // 错误信息
+}
