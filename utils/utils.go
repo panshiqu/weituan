@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -28,6 +29,22 @@ func HTTPGetJSON(url string, js interface{}) error {
 	defer resp.Body.Close()
 
 	return ReadUnmarshalJSON(resp.Body, js)
+}
+
+// HTTPJSONPostJSON POST请求发送和返回都是JSON对象
+func HTTPJSONPostJSON(url string, in, out interface{}) error {
+	data, err := json.Marshal(in)
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.Post(url, "application/json", bytes.NewReader(data))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return ReadUnmarshalJSON(resp.Body, out)
 }
 
 // RoundPrice 价格取整
