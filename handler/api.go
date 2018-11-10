@@ -41,7 +41,7 @@ func updateUserInfo(uid interface{}, key, data, signature string) error {
 		return err
 	}
 
-	if _, err := db.DoOne(db.RedisDefault, "HMSET", redis.Args{}.Add(uid).AddFlat(wxUserInfo)...); err != nil {
+	if _, err := db.DoOne(db.RedisDefault, "HMSET", redis.Args{}.Add(fmt.Sprintf("WxUserInfo%v", uid)).AddFlat(wxUserInfo)...); err != nil {
 		return err
 	}
 
@@ -58,13 +58,13 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 	if wxLogin.Code == "" {
 		// 校验令牌
 		token, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
-			return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+			return redis.Bytes(db.DoOne(db.RedisDefault, "GET", fmt.Sprintf("SessionKey%v", token.Header["uid"])))
 		})
 		if err != nil {
 			return define.ErrorInvalidToken
 		}
 
-		key, err := redis.String(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+		key, err := redis.String(db.DoOne(db.RedisDefault, "GET", fmt.Sprintf("SessionKey%v", token.Header["uid"])))
 		if err != nil {
 			return err
 		}
@@ -107,7 +107,7 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
-	if _, err := db.DoOne(db.RedisDefault, "HSET", userID, "SessionKey", wxCode2Session.SessionKey); err != nil {
+	if _, err := db.DoOne(db.RedisDefault, "SET", fmt.Sprintf("SessionKey%d", userID), wxCode2Session.SessionKey); err != nil {
 		return err
 	}
 
@@ -128,7 +128,7 @@ func serveLogin(w http.ResponseWriter, r *http.Request) error {
 func serveUpload(w http.ResponseWriter, r *http.Request) error {
 	// 校验令牌
 	if _, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
-		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+		return redis.Bytes(db.DoOne(db.RedisDefault, "GET", fmt.Sprintf("SessionKey%v", token.Header["uid"])))
 	}); err != nil {
 		return define.ErrorInvalidToken
 	}
@@ -174,7 +174,7 @@ func serveUpload(w http.ResponseWriter, r *http.Request) error {
 func servePublish(w http.ResponseWriter, r *http.Request) error {
 	// 校验令牌
 	token, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
-		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+		return redis.Bytes(db.DoOne(db.RedisDefault, "GET", fmt.Sprintf("SessionKey%v", token.Header["uid"])))
 	})
 	if err != nil {
 		return define.ErrorInvalidToken
@@ -216,7 +216,7 @@ func servePublish(w http.ResponseWriter, r *http.Request) error {
 func serveShare(w http.ResponseWriter, r *http.Request) error {
 	// 校验令牌
 	token, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
-		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+		return redis.Bytes(db.DoOne(db.RedisDefault, "GET", fmt.Sprintf("SessionKey%v", token.Header["uid"])))
 	})
 	if err != nil {
 		return define.ErrorInvalidToken
@@ -326,7 +326,7 @@ func serveList(w http.ResponseWriter, r *http.Request) error {
 	if r.ContentLength == 0 {
 		// 校验令牌
 		token, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
-			return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+			return redis.Bytes(db.DoOne(db.RedisDefault, "GET", fmt.Sprintf("SessionKey%v", token.Header["uid"])))
 		})
 		if err != nil {
 			return define.ErrorInvalidToken
@@ -389,7 +389,7 @@ func serveList(w http.ResponseWriter, r *http.Request) error {
 func serveBargain(w http.ResponseWriter, r *http.Request) error {
 	// 校验令牌
 	token, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
-		return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+		return redis.Bytes(db.DoOne(db.RedisDefault, "GET", fmt.Sprintf("SessionKey%v", token.Header["uid"])))
 	})
 	if err != nil {
 		return define.ErrorInvalidToken
@@ -476,7 +476,7 @@ func doShare(userID interface{}, skuID int) (int, error) {
 }
 
 func getWxUserInfo(info *define.BaseUserInfo) error {
-	v, err := redis.Values(db.DoOne(db.RedisDefault, "HGETALL", info.UserID))
+	v, err := redis.Values(db.DoOne(db.RedisDefault, "HGETALL", fmt.Sprintf("WxUserInfo%d", info.UserID)))
 	if err != nil {
 		return err
 	}
@@ -494,7 +494,7 @@ func serveShareList(w http.ResponseWriter, r *http.Request) error {
 	if r.ContentLength == 0 {
 		// 校验令牌
 		token, err := jwt.Parse(r.Header.Get("Token"), func(token *jwt.Token) (interface{}, error) {
-			return redis.Bytes(db.DoOne(db.RedisDefault, "HGET", token.Header["uid"], "SessionKey"))
+			return redis.Bytes(db.DoOne(db.RedisDefault, "GET", fmt.Sprintf("SessionKey%v", token.Header["uid"])))
 		})
 		if err != nil {
 			return define.ErrorInvalidToken
