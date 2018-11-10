@@ -264,6 +264,9 @@ func serveShow(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
+	// UserID+SkuID->ShareID
+	rs.ShareID = show.ShareID
+
 	if rs.Buyer != nil {
 		// 获取买家信息
 		if err := getWxUserInfo(rs.Buyer); err != nil {

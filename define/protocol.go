@@ -14,6 +14,7 @@ type HelperUserInfo struct {
 
 // SkuInfo 商品信息
 type SkuInfo struct {
+	ShareID     int     `json:",omitempty"` // 分享编号
 	SkuID       int     `json:",omitempty"` // 商品编号
 	Name        string  `json:",omitempty"` // 名称
 	Price       float64 `json:",omitempty"` // 价格
@@ -29,7 +30,6 @@ type SkuInfo struct {
 
 // ShareSkuInfo 分享商品信息
 type ShareSkuInfo struct {
-	ShareID   int   `json:",omitempty"` // 分享编号
 	ShareTime int64 `json:",omitempty"` // 分享时间
 	SkuInfo
 }
