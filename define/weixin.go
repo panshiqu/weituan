@@ -2,7 +2,7 @@ package define
 
 const (
 	// PublishTemplateID 发布模板编号
-	PublishTemplateID = "m5-VrAq0-h1nTEMXGiC1yGV9cyzAHB1gJtWitCvHklE"
+	PublishTemplateID = "bOdKVUtvMimm_dLNQr1TuPUTGiLi9cgy-BwcPR9nDeI"
 )
 
 // WxUserInfo 用户信息

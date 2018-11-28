@@ -6,6 +6,6 @@
 	"MySQLDSN": "debian-sys-maint:zRCVjyVjEwZvEIyg@tcp(localhost:3306)/weituan?charset=utf8mb4",
 	"RedisAddr": "localhost:6379",
 	"RedisAuth": "",
-	"AppID": "wx694dfc07e2ccb6cf",
-	"AppSecret": "6c8f09c6c814ec5506c6d2d315fceebc"
+	"AppID": "wxddc31437f96dd92b",
+	"AppSecret": "7af6f2643f675b88523511bd281a4caa"
 }
