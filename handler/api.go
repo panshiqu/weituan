@@ -284,7 +284,7 @@ func serveShow(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	if rs.Bargain != 0 && show.ShareID != 0 {
-		rows, err := db.MySQL.Query("SELECT UserID,BargainPrice,UNIX_TIMESTAMP(BargainTime) FROM bargain WHERE ShareID = ?", show.ShareID)
+		rows, err := db.MySQL.Query("SELECT UserID,BargainPrice,UNIX_TIMESTAMP(BargainTime) FROM bargain WHERE ShareID = ? ORDER BY BargainTime ASC", show.ShareID)
 		if err != nil {
 			return err
 		}
@@ -356,7 +356,7 @@ func serveList(w http.ResponseWriter, r *http.Request) error {
 		Seller: seller,
 	}
 
-	rows, err := db.MySQL.Query("SELECT SkuID,Name,Price,MinPrice,Bargain,Intro,Images,WeChatID,UNIX_TIMESTAMP(Deadline),UNIX_TIMESTAMP(PublishTime) FROM sku WHERE UserID = ?", rl.Seller.UserID)
+	rows, err := db.MySQL.Query("SELECT SkuID,Name,Price,MinPrice,Bargain,Intro,Images,WeChatID,UNIX_TIMESTAMP(Deadline),UNIX_TIMESTAMP(PublishTime) FROM sku WHERE UserID = ? ORDER BY SkuID DESC", rl.Seller.UserID)
 	if err != nil {
 		return err
 	}
@@ -524,7 +524,7 @@ func serveShareList(w http.ResponseWriter, r *http.Request) error {
 		Buyer: buyer,
 	}
 
-	rows, err := db.MySQL.Query("SELECT ShareID,SkuID,UNIX_TIMESTAMP(ShareTime) FROM share WHERE UserID = ?", rsl.Buyer.UserID)
+	rows, err := db.MySQL.Query("SELECT ShareID,SkuID,UNIX_TIMESTAMP(ShareTime) FROM share WHERE UserID = ? ORDER BY ShareID DESC", rsl.Buyer.UserID)
 	if err != nil {
 		return err
 	}
