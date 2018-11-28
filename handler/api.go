@@ -541,6 +541,11 @@ func serveShareList(w http.ResponseWriter, r *http.Request) error {
 			return err
 		}
 
+		// 应客户端要求屏蔽不支持砍价商品
+		if sku.Bargain == 0 {
+			continue
+		}
+
 		rsl.Skus = append(rsl.Skus, sku)
 	}
 
