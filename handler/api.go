@@ -185,6 +185,40 @@ func servePublish(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
+	if n := len(publish.Name); n == 0 || n > 255 {
+		return define.NewError(200001, "名称为空或过长")
+	}
+
+	if publish.Price <= 0 {
+		return define.NewError(200002, "非法价格")
+	}
+
+	publish.Price = utils.RoundPrice(publish.Price)
+
+	if publish.Bargain != 0 {
+		publish.MinPrice = utils.RoundPrice(publish.MinPrice)
+
+		if publish.MinPrice > publish.Price {
+			return define.NewError(200003, "低价高于价格")
+		}
+
+		if math.Abs(float64(publish.Bargain)) > math.Floor((publish.Price-publish.MinPrice)/0.01) {
+			return define.NewError(200004, "每人至少能砍一分钱")
+		}
+	}
+
+	if len(publish.Intro) > 1020 {
+		return define.NewError(200005, "介绍过长")
+	}
+
+	if len(publish.Images) > 1020 {
+		return define.NewError(200006, "上传图片过多")
+	}
+
+	if n := len(publish.WeChatID); n == 0 || n > 255 {
+		return define.NewError(200007, "微信号为空或过长")
+	}
+
 	if publish.SkuID == 0 {
 		res, err := db.MySQL.Exec("INSERT INTO sku (UserID,Name,Price,MinPrice,Bargain,Intro,Images,WeChatID,Deadline) VALUES (?,?,?,?,?,?,?,?,FROM_UNIXTIME(?))",
 			token.Header["uid"], publish.Name, publish.Price, publish.MinPrice, publish.Bargain, publish.Intro, publish.Images, publish.WeChatID, publish.Deadline)
@@ -415,7 +449,7 @@ func serveBargain(w http.ResponseWriter, r *http.Request) error {
 
 	// 不支持砍价
 	if n == 0 {
-		return &define.MyError{100001, "不支持砍价"}
+		return define.NewError(100001, "不支持砍价")
 	}
 
 	var a float64 // 已砍额度
@@ -427,12 +461,12 @@ func serveBargain(w http.ResponseWriter, r *http.Request) error {
 
 	// 已砍到底价
 	if a >= m {
-		return &define.MyError{100002, "已砍到底价"}
+		return define.NewError(100002, "已砍到底价")
 	}
 
 	// 已砍够次数
 	if b >= math.Abs(n) {
-		return &define.MyError{100003, "已砍够次数"}
+		return define.NewError(100003, "已砍够次数")
 	}
 
 	var v float64
