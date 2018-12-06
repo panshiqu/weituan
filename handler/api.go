@@ -571,8 +571,15 @@ func serveShareList(w http.ResponseWriter, r *http.Request) error {
 			return err
 		}
 
-		if err := db.MySQL.QueryRow("SELECT Name,Price,MinPrice,Bargain,Intro,Images,WeChatID,UNIX_TIMESTAMP(Deadline),UNIX_TIMESTAMP(PublishTime) FROM sku WHERE SkuID = ?", sku.SkuID).Scan(&sku.Name, &sku.Price, &sku.MinPrice, &sku.Bargain, &sku.Intro, &sku.Images, &sku.WeChatID, &sku.Deadline, &sku.PublishTime); err != nil {
+		var uid int
+
+		if err := db.MySQL.QueryRow("SELECT UserID,Name,Price,MinPrice,Bargain,Intro,Images,WeChatID,UNIX_TIMESTAMP(Deadline),UNIX_TIMESTAMP(PublishTime) FROM sku WHERE SkuID = ?", sku.SkuID).Scan(&uid, &sku.Name, &sku.Price, &sku.MinPrice, &sku.Bargain, &sku.Intro, &sku.Images, &sku.WeChatID, &sku.Deadline, &sku.PublishTime); err != nil {
 			return err
+		}
+
+		// 应客户端要求屏蔽我的商品
+		if uid == rsl.Buyer.UserID {
+			continue
 		}
 
 		// 应客户端要求屏蔽不支持砍价商品
