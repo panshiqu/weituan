@@ -113,3 +113,10 @@ type ResponseShareList struct {
 	Buyer *BaseUserInfo   `json:",omitempty"` // 买家
 	Skus  []*ShareSkuInfo `json:",omitempty"` // 商品
 }
+
+// StatInfo 统计信息
+type StatInfo struct {
+	Total      int   // 总量
+	Everydays  []int // 每日
+	Recentdays []int // 最近
+}

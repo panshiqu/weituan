@@ -633,6 +633,9 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "/shareList":
 		err = serveShareList(w, r)
 
+	case "/admin":
+		err = serveAdmin(w, r)
+
 	default:
 		err = define.ErrorUnsupportedAPI
 	}
