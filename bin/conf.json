@@ -7,5 +7,7 @@
 	"RedisAddr": "localhost:6379",
 	"RedisAuth": "",
 	"AppID": "wxddc31437f96dd92b",
-	"AppSecret": "7af6f2643f675b88523511bd281a4caa"
+	"AppSecret": "7af6f2643f675b88523511bd281a4caa",
+	"StatEverydays": 7,
+	"StatRecentdays": [15, 30]
 }

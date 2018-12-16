@@ -20,6 +20,9 @@ type GlobalConfig struct {
 	RedisAuth string // Redis密码
 	AppID     string // 小程序编号
 	AppSecret string // 小程序密钥
+
+	StatEverydays  int   // 统计每日
+	StatRecentdays []int // 统计最近
 }
 
 // Init 初始化

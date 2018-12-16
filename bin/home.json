@@ -1,5 +1,7 @@
 {
 	"Address": ":8080",
 	"MySQLDSN": "root:@tcp(localhost:3306)/weituan?charset=utf8mb4",
-	"RedisAddr": "localhost:6379"
+	"RedisAddr": "localhost:6379",
+	"StatEverydays": 7,
+	"StatRecentdays": [15, 30]
 }
