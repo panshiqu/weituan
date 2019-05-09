@@ -1,0 +1,8 @@
+前五名发布商品最多的玩家
+SELECT user.Nickname,COUNT(*) AS CNT FROM sku , user WHERE sku.UserID = user.UserID GROUP BY sku.UserID ORDER BY CNT DESC LIMIT 5
+
+前五名分享最多的玩家
+前五名被分享最多的商品
+
+前五名砍价最多的玩家（爱买东西）
+前五名砍价最多的商品（热销商品）
